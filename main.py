@@ -1,3 +1,13 @@
+"""
+This module implements different bank account types based on an abstract AccountManager class,
+following the Factory design pattern to encapsulate the creation logic of accounts.
+
+The Factory pattern decouples the client code from the concrete implementations,
+promoting scalability and adherence to SOLID principles.
+
+Implemented account types include: SavingsAccount, CheckingAccount, and CreditAccount.
+"""
+
 from abc import ABC, abstractmethod
 
 class AccountManager(ABC):
@@ -170,7 +180,7 @@ class CreditAccount(AccountManager):
             print(f"Repayment of {amount} made. New balance is {self.balance}.")
         else:
             print("Repayment amount must be positive.")
-            
+
  
     def check_credit_limit(self, amount):
         """Check if a withdrawal amount exceeds the credit limit.
