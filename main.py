@@ -8,196 +8,65 @@ promoting scalability and adherence to SOLID principles.
 Implemented account types include: SavingsAccount, CheckingAccount, and CreditAccount.
 """
 
-from abc import ABC, abstractmethod
+from accounts.factory import AccountFactory
+from cards.factory import CardFactory
 
-class AccountManager(ABC):
-
-    """
-Abstract base class to define the interface and common behavior
-for managing different types of bank accounts.
-
-"""
-    @abstractmethod
-    def account_type(self, account_type: str):
-        pass
-    @abstractmethod
-    def deposit(self, amount: float):
-        pass
-    @abstractmethod
-    def withdraw(self, amount: float):
-        pass
-    @abstractmethod 
-    def get_balance(self) -> float:
-        pass
-    @abstractmethod
-    def get_account_details(self) -> dict:
-        pass
-
-
-class SavingsAccount(AccountManager):
-    """
-Concrete implementation of a Savings Account inheriting from AccountManager.
-
-Implements specific behavior for managing deposits, withdrawals,
-balance inquiries, and account details relevant to savings accounts.
-"""
-
-    def __init__(self, account_number: str, initial_balance: float = 0.0):
-        self.account_number = account_number
-        self.balance = initial_balance
-        self.account_type_name = "Savings"
-
-    def account_type(self, account_type: str):
-        return self.account_type_name
-
-    def deposit(self, amount: float):
-        if amount > 0:
-            self.balance += amount
-            print(f"Deposited {amount}. New balance is {self.balance}.")
-        else:
-            print("Deposit amount must be positive.")
-
-    def withdraw(self, amount: float):
-        if 0 < amount <= self.balance:
-            self.balance -= amount
-            print(f"Withdrew {amount}. New balance is {self.balance}.")
-        else:
-            print("Insufficient funds or invalid withdrawal amount.")
-
-    def get_balance(self) -> float:
-        return self.balance
-
-    def get_account_details(self) -> dict:
-        return {
-            "account_number": self.account_number,
-            "account_type": self.account_type_name,
-            "balance": self.balance
-        }
-
-class CheckingAccount(AccountManager):
-    """
-Concrete implementation of a Checking Account inheriting from AccountManager.
-
-Implements specific behavior for managing deposits, withdrawals,
-balance inquiries, and account details relevant to checking accounts.
-"""
-
-    def __init__(self, account_number: str, initial_balance: float = 0.0):
-        self.account_number = account_number
-        self.balance = initial_balance
-        self.account_type_name = "Checking"
-
-    def account_type(self, account_type: str):
-        return self.account_type_name
-
-    def deposit(self, amount: float):
-        if amount > 0:
-            self.balance += amount
-            print(f"Deposited {amount}. New balance is {self.balance}.")
-        else:
-            print("Deposit amount must be positive.")
-
-    def withdraw(self, amount: float):
-        if 0 < amount <= self.balance:
-            self.balance -= amount
-            print(f"Withdrew {amount}. New balance is {self.balance}.")
-        else:
-            print("Insufficient funds or invalid withdrawal amount.")
-
-    def get_balance(self) -> float:
-        return self.balance
-
-    def get_account_details(self) -> dict:
-        return {
-            "account_number": self.account_number,
-            "account_type": self.account_type_name,
-            "balance": self.balance
-        }
-
-class CreditAccount(AccountManager):
-
-    def __init__(self, account_number: str, credit_limit: float, interest_rate: float, initial_balance: float = 0.0):
-        self.account_number = account_number
-        self.balance = initial_balance
-        self.credit_limit = credit_limit
-        self.interest_rate = interest_rate
-        self.account_type_name = "Credit"
-
-    def account_type(self, account_type: str):
-        return self.account_type_name
-
-    def deposit(self, amount: float):
-        if amount > 0:
-            self.balance += amount
-            print(f"Deposited {amount}. New balance is {self.balance}.")
-        else:
-            print("Deposit amount must be positive.")
-
-    def withdraw(self, amount: float):
-        if 0 < amount <= (self.balance + self.credit_limit):
-            self.balance -= amount
-            print(f"Withdrew {amount}. New balance is {self.balance}.")
-        else:
-            print("Insufficient funds or invalid withdrawal amount.")
-
-    def get_balance(self) -> float:
-        return self.balance
-
-    def calculate_interest(self, months: int) -> float:
-        """Calculate interest on the current balance over a given number of months.
-
-        Args:
-            months (int): Number of months to calculate interest for.
-
-        Returns:
-            float: Calculated interest amount.
-        """
-        monthly_rate = self.interest_rate / 12 / 100
-        interest = self.balance * monthly_rate * months
-        return interest if self.balance > 0 else 0.0 
+def main():
+    # --- FASE 1: PREPARACIÓN DEL ENTORNO (El banco crea los datos) ---
+    # Esto no lo hace el usuario en el cajero, es el estado inicial del sistema.
     
-    def apply_interest(self, months: int):
-        """Apply calculated interest to the account balance.
+    print("Configurando el entorno del banco...")
+    account_factory = AccountFactory()
+    card_factory = CardFactory()
 
-        Args:
-            months (int): Number of months to apply interest for.
-        """
-        interest = self.calculate_interest(months)
-        if interest > 0:
-            self.balance += interest
-            print(f"Applied {interest} interest for {months} months. New balance is {self.balance}.")
-        else:
-            print("No interest applied as balance is non-positive.")
+    # Creamos una cuenta de ahorros con 1000€
+    savings_account_1 = account_factory.create_account(
+        "savings", 
+        account_holder="Christian Marzal", 
+        balance=1000
+    )
 
-    def make_repayment(self, amount: float):
-        """Make a repayment towards the credit account.
+    # Creamos una tarjeta de débito asociada a esa cuenta
+    debit_card_1 = card_factory.create_card(
+        "debit", 
+        card_number="1234-5678-9012-3456", 
+        pin="1234", 
+        linked_account=savings_account_1
+    )
+    print("Entorno listo.\n")
 
-        Args:
-            amount (float): Amount to repay.
-        """
-        if amount > 0:
-            self.balance += amount
-            print(f"Repayment of {amount} made. New balance is {self.balance}.")
-        else:
-            print("Repayment amount must be positive.")
 
- 
-    def check_credit_limit(self, amount):
-        """Check if a withdrawal amount exceeds the credit limit.
+    # --- FASE 2: SIMULACIÓN DEL CAJERO AUTOMÁTICO ---
+    # El usuario "introduce" la tarjeta en el cajero.
+    
+    print("Bienvenido al ATM. Por favor, inserte su tarjeta.")
+    # (Aquí simularíamos la inserción de debit_card_1)
+    
+    pin_introducido = input("Introduzca su PIN: ")
 
-        Args:
-            amount (float): Amount to check against the credit limit.  
-        Returns:
-            bool: True if within limit, False otherwise.       
-        """
-        return amount <= (self.balance + self.credit_limit) 
+    if debit_card_1.validate_pin(pin_introducido):
+        print("PIN correcto.")
+        
+        # El cajero opera con la cuenta asociada
+        cuenta_actual = debit_card_1.get_account()
+        print(f"Saldo actual: {cuenta_actual.get_balance()}€")
+        
+        try:
+            cantidad_a_retirar = float(input("Introduzca la cantidad a retirar: "))
+            print(f"Retirando {cantidad_a_retirar}€...")
+            cuenta_actual.withdraw(cantidad_a_retirar)
+            print(f"Nuevo saldo: {cuenta_actual.get_balance()}€")
+        except ValueError as e:
+            print(f"Error: {e}")
+        
+    else:
+        print("PIN incorrecto.")
 
-    def get_account_details(self) -> dict:
-        return {
-            "account_number": self.account_number,
-            "account_type": self.account_type_name,
-            "balance": self.balance,
-            "credit_limit": self.credit_limit,
-            "interest_rate": self.interest_rate
-        }   
-  
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
