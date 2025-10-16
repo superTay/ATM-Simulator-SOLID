@@ -1,0 +1,7 @@
+{
+  "python.analysis.extraPaths": ["."],
+  "openai.codex.approvalMode": "on-request",
+  "openai.codex.inlineApprovals": true,
+  "openai.codex.notificationsEnabled": true,
+  "openai.codex.testFlag": "settings-json-valid"
+}
