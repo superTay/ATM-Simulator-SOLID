@@ -43,9 +43,40 @@ def main():
     print("Bienvenido al ATM. Por favor, inserte su tarjeta.")
     # (Aquí simularíamos la inserción de debit_card_1)
     
-    pin_introducido = input("Introduzca su PIN: ")
+    # Gestión de PIN con 3 intentos y bloqueo temporal
+    MAX_INTENTOS = 3
+    BLOQUEO_SEGUNDOS = 30  # bloquear durante 30 segundos tras 3 fallos
 
-    if debit_card_1.validate_pin(pin_introducido):
+    intentos = 0
+    bloqueado_hasta = None
+
+    import time
+
+    while True:
+        # Comprobar si hay bloqueo activo
+        if bloqueado_hasta and time.time() < bloqueado_hasta:
+            restante = int(bloqueado_hasta - time.time())
+            print(f"Tarjeta temporalmente bloqueada. Inténtelo de nuevo en {restante} s...")
+            time.sleep(min(3, max(1, restante)))
+            continue
+
+        pin_introducido = input("Introduzca su PIN: ")
+
+        if debit_card_1.validate_pin(pin_introducido):
+            print("PIN correcto.")
+            break
+        else:
+            intentos += 1
+            restantes = MAX_INTENTOS - intentos
+            if restantes > 0:
+                print(f"PIN incorrecto. Intentos restantes: {restantes}")
+            if intentos >= MAX_INTENTOS:
+                print("Demasiados intentos fallidos. Bloqueando temporalmente la tarjeta...")
+                bloqueado_hasta = time.time() + BLOQUEO_SEGUNDOS
+                intentos = 0  # resetear el contador tras aplicar bloqueo
+                continue
+
+    if True:  # ya validado el PIN y salimos del bucle
         print("PIN correcto.")
         
         # El cajero opera con la cuenta asociada
@@ -60,12 +91,9 @@ def main():
         except ValueError as e:
             print(f"Error: {e}")
         
-    else:
-        print("PIN incorrecto.")
 
 if __name__ == "__main__":
     main()
-
 
 
 
