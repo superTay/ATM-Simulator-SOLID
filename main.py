@@ -78,23 +78,42 @@ def main():
 
     if True:  # ya validado el PIN y salimos del bucle
         print("PIN correcto.")
-        
+
         # El cajero opera con la cuenta asociada
         cuenta_actual = debit_card_1.get_account()
-        print(f"Saldo actual: {cuenta_actual.get_balance()}€")
-        
-        try:
-            cantidad_a_retirar = float(input("Introduzca la cantidad a retirar: "))
-            print(f"Retirando {cantidad_a_retirar}€...")
-            cuenta_actual.withdraw(cantidad_a_retirar)
-            print(f"Nuevo saldo: {cuenta_actual.get_balance()}€")
-        except ValueError as e:
-            print(f"Error: {e}")
+
+        # Menú de operaciones básicas
+        while True:
+            print("\nSeleccione una opción:")
+            print("1) Consultar saldo")
+            print("2) Retirar efectivo")
+            print("3) Salir")
+            opcion = input("> ").strip()
+
+            if opcion == "1":
+                print(f"Saldo actual: {cuenta_actual.get_balance()}€")
+            elif opcion == "2":
+                try:
+                    cantidad_a_retirar = float(input("Introduzca la cantidad a retirar: "))
+                    if cantidad_a_retirar <= 0:
+                        print("La cantidad debe ser positiva.")
+                        continue
+                    print(f"Retirando {cantidad_a_retirar}€...")
+                    cuenta_actual.withdraw(cantidad_a_retirar)
+                    print(f"Nuevo saldo: {cuenta_actual.get_balance()}€")
+                except ValueError as e:
+                    print(f"Error: {e}")
+                except Exception as e:
+                    print(f"Operación no completada: {e}")
+            elif opcion == "3":
+                print("Gracias por usar el ATM. ¡Hasta pronto!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
         
 
 if __name__ == "__main__":
     main()
-
 
 
 
