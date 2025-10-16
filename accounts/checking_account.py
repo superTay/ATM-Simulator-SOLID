@@ -9,9 +9,10 @@ Implements specific behavior for managing deposits, withdrawals,
 balance inquiries, and account details relevant to checking accounts.
 """
 
-    def __init__(self, account_number: str, initial_balance: float = 0.0):
+    def __init__(self, account_holder: str, account_number: str, balance: float = 0.0):
+        self.account_holder = account_holder
         self.account_number = account_number
-        self.balance = initial_balance
+        self.balance = balance
         self.account_type_name = "Checking"
 
     def account_type(self, account_type: str):

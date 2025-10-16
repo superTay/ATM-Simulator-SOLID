@@ -9,9 +9,10 @@ class CreditAccount(AccountManager):
     interest calculation and application, repayment, and credit limit checks.
     It encapsulates the behavior specific to credit accounts, including interest rates and credit limits.
     """
-    def __init__(self, account_number: str, credit_limit: float, interest_rate: float, initial_balance: float = 0.0):
+    def __init__(self, account_holder: str, account_number: str, credit_limit: float, interest_rate: float, balance: float = 0.0):
+        self.account_holder = account_holder
         self.account_number = account_number
-        self.balance = initial_balance
+        self.balance = balance
         self.credit_limit = credit_limit
         self.interest_rate = interest_rate
         self.account_type_name = "Credit"

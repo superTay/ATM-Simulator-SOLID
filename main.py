@@ -22,7 +22,8 @@ def main():
     # Creamos una cuenta de ahorros con 1000€
     savings_account_1 = account_factory.create_account(
         "savings", 
-        account_holder="Christian Marzal", 
+        account_holder="Christian Marzal",
+        account_number="12345",
         balance=1000
     )
 
