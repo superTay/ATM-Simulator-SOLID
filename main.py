@@ -43,30 +43,77 @@ def main():
     print("Bienvenido al ATM. Por favor, inserte su tarjeta.")
     # (Aquí simularíamos la inserción de debit_card_1)
     
-    pin_introducido = input("Introduzca su PIN: ")
+    # Gestión de PIN con 3 intentos y bloqueo temporal
+    MAX_INTENTOS = 3
+    BLOQUEO_SEGUNDOS = 30  # bloquear durante 30 segundos tras 3 fallos
 
-    if debit_card_1.validate_pin(pin_introducido):
+    intentos = 0
+    bloqueado_hasta = None
+
+    import time
+
+    while True:
+        # Comprobar si hay bloqueo activo
+        if bloqueado_hasta and time.time() < bloqueado_hasta:
+            restante = int(bloqueado_hasta - time.time())
+            print(f"Tarjeta temporalmente bloqueada. Inténtelo de nuevo en {restante} s...")
+            time.sleep(min(3, max(1, restante)))
+            continue
+
+        pin_introducido = input("Introduzca su PIN: ")
+
+        if debit_card_1.validate_pin(pin_introducido):
+            print("PIN correcto.")
+            break
+        else:
+            intentos += 1
+            restantes = MAX_INTENTOS - intentos
+            if restantes > 0:
+                print(f"PIN incorrecto. Intentos restantes: {restantes}")
+            if intentos >= MAX_INTENTOS:
+                print("Demasiados intentos fallidos. Bloqueando temporalmente la tarjeta...")
+                bloqueado_hasta = time.time() + BLOQUEO_SEGUNDOS
+                intentos = 0  # resetear el contador tras aplicar bloqueo
+                continue
+
+    if True:  # ya validado el PIN y salimos del bucle
         print("PIN correcto.")
-        
+
         # El cajero opera con la cuenta asociada
         cuenta_actual = debit_card_1.get_account()
-        print(f"Saldo actual: {cuenta_actual.get_balance()}€")
+
+        # Menú de operaciones básicas
+        while True:
+            print("\nSeleccione una opción:")
+            print("1) Consultar saldo")
+            print("2) Retirar efectivo")
+            print("3) Salir")
+            opcion = input("> ").strip()
+
+            if opcion == "1":
+                print(f"Saldo actual: {cuenta_actual.get_balance()}€")
+            elif opcion == "2":
+                try:
+                    cantidad_a_retirar = float(input("Introduzca la cantidad a retirar: "))
+                    if cantidad_a_retirar <= 0:
+                        print("La cantidad debe ser positiva.")
+                        continue
+                    print(f"Retirando {cantidad_a_retirar}€...")
+                    cuenta_actual.withdraw(cantidad_a_retirar)
+                    print(f"Nuevo saldo: {cuenta_actual.get_balance()}€")
+                except ValueError as e:
+                    print(f"Error: {e}")
+                except Exception as e:
+                    print(f"Operación no completada: {e}")
+            elif opcion == "3":
+                print("Gracias por usar el ATM. ¡Hasta pronto!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
         
-        try:
-            cantidad_a_retirar = float(input("Introduzca la cantidad a retirar: "))
-            print(f"Retirando {cantidad_a_retirar}€...")
-            cuenta_actual.withdraw(cantidad_a_retirar)
-            print(f"Nuevo saldo: {cuenta_actual.get_balance()}€")
-        except ValueError as e:
-            print(f"Error: {e}")
-        
-    else:
-        print("PIN incorrecto.")
 
 if __name__ == "__main__":
     main()
-
-
 
 
 
