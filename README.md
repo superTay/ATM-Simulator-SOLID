@@ -33,17 +33,17 @@ This project is a modular ATM simulator implemented in Python. It showcases a cl
 
 ATM/
 ├── accounts/
-│   ├── checking_account.py
-│   ├── savings_account.py
-│   ├── credit_account.py
-│   ├── account_manager.py
-│   └── factory.py
+│ ├── checking_account.py
+│ ├── savings_account.py
+│ ├── credit_account.py
+│ ├── account_manager.py
+│ └── factory.py
 ├── cards/
-│   ├── card.py
-│   ├── debit_card.py
-│   └── credit_card.py
+│ ├── card.py
+│ ├── debit_card.py
+│ └── credit_card.py
 ├── ui/
-│   └── app.py
+│ └── app.py
 └── README.md
 
 - `ui/app.py`: GUI entry point and screens (Welcome, Card Insert, PIN, Menu, Amount, Receipt).
