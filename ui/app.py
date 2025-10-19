@@ -13,11 +13,14 @@ class Session:
         self.card = None
         self.account = None
         self.authenticated = False
+        self.pin_attempts = 0
+        self.max_attempts = 3
 
     def reset(self):
         self.card = None
         self.account = None
         self.authenticated = False
+        self.pin_attempts = 0
 
 
 class ATMApp(tk.Tk):
@@ -172,11 +175,27 @@ class PinScreen(tk.Frame):
         if card.validate_pin(pin):
             self.controller.session.authenticated = True
             self.controller.session.account = card.get_account()
+            self.controller.session.pin_attempts = 0
             self.pin_var.set("")
             self.controller.show_frame("MenuScreen")
         else:
-            messagebox.showerror("PIN", "PIN incorrecto. Intente de nuevo.")
-            self.pin_var.set("")
+            sess = self.controller.session
+            sess.pin_attempts += 1
+            remaining = max(sess.max_attempts - sess.pin_attempts, 0)
+            if sess.pin_attempts >= sess.max_attempts:
+                messagebox.showerror(
+                    "PIN",
+                    "Tarjeta bloqueada por intentos fallidos (3). Regresando al inicio.",
+                )
+                self.pin_var.set("")
+                self.controller.session.reset()
+                self.controller.show_frame("WelcomeScreen")
+            else:
+                messagebox.showerror(
+                    "PIN",
+                    f"PIN incorrecto. Intentos restantes: {remaining}.",
+                )
+                self.pin_var.set("")
 
     def cancel(self):
         self.controller.session.reset()
